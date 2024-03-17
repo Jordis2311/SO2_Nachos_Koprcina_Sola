@@ -18,6 +18,10 @@
 ///   purposes.
 
 bool thread2Done = false;
+bool thread3Done = false;
+bool thread4Done = false;
+bool thread5Done = false;
+
 void
 SimpleThread(void *name_)
 {
@@ -30,7 +34,16 @@ SimpleThread(void *name_)
         currentThread->Yield();
     }
     if (strcmp(currentThread->GetName(),"2nd")==0) {
-	thread2Done = true;
+	    thread2Done = true;
+    }
+    if (strcmp(currentThread->GetName(),"3rd")==0) {
+	    thread3Done = true;
+    }
+    if (strcmp(currentThread->GetName(),"4th")==0) {
+	    thread4Done = true;
+    }
+    if (strcmp(currentThread->GetName(),"5th")==0) {
+	    thread5Done = true;
     }
     printf("!!! Thread `%s` has finished SimpleThread\n", currentThread->GetName());
  
@@ -44,13 +57,19 @@ void
 ThreadTestSimple()
 {
     Thread *newThread = new Thread("2nd");
+    Thread *newThread3 = new Thread("3rd");
+    Thread *newThread4 = new Thread("4th");
+    Thread *newThread5 = new Thread("5th");
     newThread->Fork(SimpleThread, NULL);
+    newThread3->Fork(SimpleThread, NULL);
+    newThread4->Fork(SimpleThread, NULL);
+    newThread5->Fork(SimpleThread, NULL);
 
     //the "main" thread also executes the same function
     SimpleThread(NULL);
 
    //Wait for the 2nd thread to finish if needed
-    while (!thread2Done) {
+    while (!thread2Done || !thread3Done || !thread5Done || !thread5Done) {
         currentThread->Yield(); 
     }
     printf("Test finished\n");
