@@ -7,6 +7,8 @@
 
 #include "thread_test_simple.hh"
 #include "system.hh"
+#include "semaphore.hh"
+#include "lib/utility.hh"
 
 #include <stdio.h>
 #include <string.h>
@@ -22,15 +24,27 @@ bool thread3Done = false;
 bool thread4Done = false;
 bool thread5Done = false;
 
+#ifdef SEMAPHORE_TEST
+    Semaphore *sem = new Semaphore("semaforo", 3);
+#endif
+
 void
 SimpleThread(void *name_)
 {
-
     // If the lines dealing with interrupts are commented, the code will
     // behave incorrectly, because printf execution may cause race
     // conditions.
     for (unsigned num = 0; num < 10; num++) {
+
+    #ifdef SEMAPHORE_TEST
+        DEBUG('s',"Semaphore Wait\n");
+        sem->P();
+    #endif
         printf("*** Thread `%s` is running: iteration %u\n", currentThread->GetName(), num);
+    #ifdef SEMAPHORE_TEST
+        DEBUG('s',"Semaphore Post\n");
+        sem->V();
+    #endif
         currentThread->Yield();
     }
     if (strcmp(currentThread->GetName(),"2nd")==0) {
@@ -74,3 +88,4 @@ ThreadTestSimple()
     }
     printf("Test finished\n");
 }
+

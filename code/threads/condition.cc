@@ -23,12 +23,14 @@
 
 Condition::Condition(const char *debugName, Lock *conditionLock)
 {
-    // TODO
+    name = debugName;
+    cd_lock = conditionLock;
+    queue = new List<Thread *>;
 }
 
 Condition::~Condition()
 {
-    // TODO
+    delete queue;
 }
 
 const char *
@@ -40,7 +42,7 @@ Condition::GetName() const
 void
 Condition::Wait()
 {
-    // TODO
+    ASSERT(cd_lock->IsHeldByCurrentThread());
 }
 
 void

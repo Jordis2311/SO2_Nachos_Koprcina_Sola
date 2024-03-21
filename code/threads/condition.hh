@@ -19,6 +19,7 @@
 
 
 #include "lock.hh"
+#include "semaphore.h"
 
 
 /// This class defines a “condition variable”.
@@ -77,6 +78,12 @@ private:
     const char *name;
 
     // Other needed fields are to be added here.
+
+    Lock *cd_lock;
+
+    /// Queue of threads waiting.
+    List<Semaphore *> *semaforos;
+
 };
 
 
