@@ -16,7 +16,9 @@
 
 
 #include "condition.hh"
-
+#include "lock.hh"
+#include "semaphore.hh"
+#include "lib/utility.hh"
 
 /// Dummy functions -- so we can compile our later assignments.
 ///
@@ -25,7 +27,7 @@ Condition::Condition(const char *debugName, Lock *conditionLock)
 {
     name = debugName;
     cd_lock = conditionLock;
-    queue = new List<Thread *>;
+    queue = new List<Semaphore *>;
 }
 
 Condition::~Condition()
@@ -43,16 +45,43 @@ void
 Condition::Wait()
 {
     ASSERT(cd_lock->IsHeldByCurrentThread());
+
+    // Creamos un semaforo en 0, lo agregamos a la lista y lo ponemos a esperar
+    Semaphore *semaforo = new Semaphore(name,0);
+
+    queue->Append(semaforo);
+    
+    DEBUG('s',"Soltando el Lock y Esperando condicion\n");
+    // Liberamos el lock antes de esperar y lo tomamos cuando se da la condicion
+    cd_lock->Release();
+    
+    semaforo->P();
+
+    DEBUG('s',"Condicion cumplida, Tomamos el Lock\n");
+    cd_lock->Acquire();
+
 }
 
 void
 Condition::Signal()
 {
-    // TODO
+    Semaphore *semaforo = queue->Pop();
+
+    // Activamos un semaforo de la lista
+    if (semaforo != nullptr) {
+        semaforo->V();
+    }
+
 }
 
 void
 Condition::Broadcast()
 {
-    // TODO
+    Semaphore *semaforo = queue->Pop();
+
+    // Activamos los semaforos de la lista
+    while (semaforo != nullptr) {
+        semaforo->V();
+        semaforo = queue->Pop();
+    }
 }

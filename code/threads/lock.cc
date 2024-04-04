@@ -48,6 +48,7 @@ Lock::Acquire()
 {
     semaforo->P();
     thread_name = currentThread->GetName();
+    DEBUG('s',"Lock tomado por thread %s\n", thread_name);
 }
 
 void
@@ -55,6 +56,7 @@ Lock::Release()
 {   
     ASSERT(IsHeldByCurrentThread());
     semaforo->V();
+    DEBUG('s',"Lock liberado por thread %s\n", thread_name);
 }
 
 bool

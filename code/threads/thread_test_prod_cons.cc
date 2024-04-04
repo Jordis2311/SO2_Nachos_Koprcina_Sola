@@ -6,12 +6,54 @@
 
 
 #include "thread_test_prod_cons.hh"
+#include "condition.hh"
+#include "lock.hh"
 
 #include <stdio.h>
 
+#define max 3
+int buffer[max];
+int items = 0;
+
+Lock *lock = new Lock("bufferlock");
+Condition *condicionNE = new Condition("condNE", lock);
+Condition *condicionNF = new Condition("condNF", lock);
+
+void productor(void *name_){
+    for(int i = 1;i <= 1000;i++){
+        lock->Acquire();
+        while(items == max){
+            printf("Productor esperando (buffer lleno)\n");
+            condicionNF->Wait();
+        }
+        printf("Productor produce: %d en %d\n", i, items);
+        buffer[items] = i;
+        items++;
+        condicionNE->Signal();
+        lock->Release();
+    }
+}
+
+void consumidor(){
+    for(int i = 1;i <= 1000;i++){
+        lock->Acquire();
+        while(items == 0){
+            printf("Consumidor esperando (buffer vacio)\n");
+            condicionNE->Wait();
+        }
+        items--;
+        printf("Consumidor consume: %d en %d\n", buffer[items], items);
+        condicionNF->Signal();
+        lock->Release();
+    }
+}
 
 void
 ThreadTestProdCons()
 {
-    printf("Test unimplemented!\n");
+    Thread *newThread = new Thread("Productor");
+    newThread->Fork(productor, NULL);
+
+    consumidor();
+
 }

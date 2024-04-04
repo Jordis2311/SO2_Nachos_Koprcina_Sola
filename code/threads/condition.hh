@@ -82,7 +82,7 @@ private:
     Lock *cd_lock;
 
     /// Queue of threads waiting.
-    List<Semaphore *> *semaforos;
+    List<Semaphore *> *queue;
 
 };
 
