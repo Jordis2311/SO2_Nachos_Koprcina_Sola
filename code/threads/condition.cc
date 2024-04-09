@@ -57,6 +57,8 @@ Condition::Wait()
     
     semaforo->P();
 
+    delete semaforo;
+
     DEBUG('s',"Condicion cumplida, Tomamos el Lock\n");
     cd_lock->Acquire();
 
